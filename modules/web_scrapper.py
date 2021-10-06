@@ -21,7 +21,8 @@ def _month_as_number(month_name: str) -> int:
 
 
 class PageScrapper:
-    """Call this class to scrap the item page"""
+    """Call this class to scrap the item page and save it to the data folder
+    It allows one file per day, and overwrites the last one if called more than once in a single day"""
 
     def __init__(self) -> None:
         page_content = self.__get_page()
@@ -55,15 +56,12 @@ class PageScrapper:
         """Now we have a list of strings, which one containing a median price and quantity sold in a given datetime
         It'd be nice to adjust it so that it becomes a nice and tidy list of dicts before we save it"""
         dataset: list = []
-        dataset_row_model = {'datetime': str, 'price': int, 'quantity': int}
+        dataset_row_model = {'datetime': str, 'mean_price': int, 'quantity': int}
         for item in raw_data:
             item = item.replace('"', '')
             time_info, price, quantity = item.split(',')
             dataset_row_model['quantity'] = int(quantity)
-            price = price.replace('.', '')
-            while len(price) < 4:
-                price += '0'
-            dataset_row_model['price'] = int(price)
+            dataset_row_model['mean_price'] = float(price)
             time_info = time_info.replace(': +0', '')
             month, day, year, hour = time_info.split()
             month = _month_as_number(month)
@@ -71,7 +69,7 @@ class PageScrapper:
             dataset_row_model['datetime'] = time_info.isoformat()
 
             dataset.append(dataset_row_model)
-            dataset_row_model = {'datetime': str, 'price': int, 'quantity': int}
+            dataset_row_model = {'datetime': str, 'mean_price': int, 'quantity': int}
 
         return dataset
 
