@@ -1,6 +1,6 @@
 """
 Scraps the steam community page for item price history
-Save it as json to use in other moduls
+Save it as json to use in other modules
 """
 import requests
 from bs4 import BeautifulSoup
