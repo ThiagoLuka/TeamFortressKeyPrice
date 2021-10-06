@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import date, datetime
 import json
+import os
 
 
 TEAM_FORTRESS_KEY_PAGE_URL = 'https://steamcommunity.com/market/listings/440/Mann%20Co.%20Supply%20Crate%20Key'
@@ -77,7 +78,9 @@ class PageScrapper:
     def __save_data(dataset: list) -> None:
         """Saves dataset into json file"""
         today = date.today().isoformat()
-        with open('data_from_' + today, 'w') as file:
+        file_name = 'data_from_' + today
+        file_path = os.path.join('data', file_name)
+        with open(file_path, 'w') as file:
             json.dump(dataset, file, indent=4)
 
 
