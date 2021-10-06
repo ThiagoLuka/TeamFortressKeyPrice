@@ -1,5 +1,6 @@
 """
-Scraps the steam community page for the item price history
+Scraps the steam community page for item price history
+Save it as json to use in other moduls
 """
 import requests
 from bs4 import BeautifulSoup
@@ -12,6 +13,7 @@ TEAM_FORTRESS_KEY_PAGE_URL = 'https://steamcommunity.com/market/listings/440/Man
 
 
 def _month_as_number(month_name: str) -> int:
+    """Little function to translate month names to numbers"""
     month_names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     month_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     month_dict = dict(zip(month_names, month_numbers))
@@ -19,6 +21,7 @@ def _month_as_number(month_name: str) -> int:
 
 
 class PageScrapper:
+    """Call this class to scrap the item page"""
 
     def __init__(self) -> None:
         page_content = self.__get_page()
@@ -33,10 +36,9 @@ class PageScrapper:
 
     @staticmethod
     def __parse_page(page_content: bytes) -> list:
-        """the page displays a graph with the history of median sales prices by date
-        we'll retrieve the argument given to the javascript function that draws this graph"""
+        """The page contains a graph that displays the history of median sales prices by date
+        We'll retrieve the argument given to the javascript function that draws this graph"""
         soup = BeautifulSoup(page_content, 'html.parser')
-
         javascript_texts = soup.find_all(type='text/javascript')
         info = javascript_texts[-1]  # It's the last one!
 
@@ -50,9 +52,8 @@ class PageScrapper:
 
     @staticmethod
     def __clean_raw_data(raw_data: list) -> list:
-        """now we have a list of strings, which one containing a median price, quantity sold and a datetime
-        before we store it, it'd be nice to adjust it so that it becomes a nice and tidy list of dicts
-        from now on, it'll be no longer the graph_info, but our dataset"""
+        """Now we have a list of strings, which one containing a median price and quantity sold in a given datetime
+        It'd be nice to adjust it so that it becomes a nice and tidy list of dicts before we save it"""
         dataset: list = []
         dataset_row_model = {'datetime': str, 'price': int, 'quantity': int}
         for item in raw_data:
